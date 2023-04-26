@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>My awesome website</title>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+        <h1>My awesome website</h1>
+        <div id="logged-in-indicator"></div>
+        <form action="/login" enctype="application/x-www-form-urlencoded" method="POST" class="login-form">
+            <div class="form-row">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" />
+            </div>
+            <div class="form-row">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" />
+            </div>
+            <div class="form-row">
+                <input type="submit" value="Login" />
+            </div>
+        </form>
+        <div id="secret-message-container">
+        </div>
+    </body>
+    <script>
+        const indicatorDiv = document.getElementById('logged-in-indicator');
+        const secretMessageContainer = document.getElementById('secret-message-container');
+
+        const sessionCookieExists = () => {
+            return document.cookie.split(';').some(item => item.trim().startsWith('session='));
+        };
+
+        const loadSecretMessage = async () => {
+            const response = await fetch('/secret', {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                secretMessageContainer.innerText = 'Failed to get secret message :( Are you logged in?';
+                return;
+            }
+
+            secretMessageContainer.innerText = await response.text();
+        };
+
+        indicatorDiv.innerText = sessionCookieExists() ? 'You\'re currently logged in.' : 'You\'re not logged in.';
+
+        if (sessionCookieExists()) {
+            loadSecretMessage().then();
+        }
+    </script>
+</html>
